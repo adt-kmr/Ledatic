@@ -1,0 +1,37 @@
+# Vercel only builds frontend/ (see vercel.json). Everything below is dead
+# weight in the build container — ml/ alone is ~95 MB of PaySim CSV and model
+# artifacts, most of the repo's 119 MB.
+#
+# Every pattern is anchored with a leading "/". Unanchored gitignore patterns
+# match at any depth, so a bare "*.png" would also strip frontend/public/logo.png
+# and frontend/src/assets/*.png out of the build.
+/backend/
+/blockchain/
+/camara/
+/ml/
+/sdk/
+/sdk-android/
+/sdk-ios/
+/supabase/
+/scripts/
+/design/
+/docs/
+/poster/
+
+# Other platforms' deploy configs
+/docker-compose.yml
+/railway.toml
+/render.yaml
+/Makefile
+/start.sh
+
+# Docs and pitch collateral (root level only)
+/*.md
+/*.pdf
+/*.png
+/*.html
+/presentation_notes.md
+
+# Rebuilt in the container
+node_modules/
+/frontend/dist/
