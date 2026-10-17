@@ -1,0 +1,42 @@
+FROM node:20-slim AS build
+
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+COPY . .
+
+ARG VITE_API_URL=http://localhost:8000
+ENV VITE_API_URL=${VITE_API_URL}
+
+ARG VITE_RAZORPAY_KEY=rzp_test_T9Yi57tyeiozye
+ENV VITE_RAZORPAY_KEY=${VITE_RAZORPAY_KEY}
+
+ARG VITE_GOOGLE_CLIENT_ID
+ENV VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+
+ARG VITE_TWILIO_ACCOUNT_SID
+ENV VITE_TWILIO_ACCOUNT_SID=${VITE_TWILIO_ACCOUNT_SID}
+
+ARG VITE_TWILIO_AUTH_TOKEN
+ENV VITE_TWILIO_AUTH_TOKEN=${VITE_TWILIO_AUTH_TOKEN}
+
+ARG VITE_TWILIO_FROM_NUMBER
+ENV VITE_TWILIO_FROM_NUMBER=${VITE_TWILIO_FROM_NUMBER}
+
+ARG VITE_TWILIO_TO_NUMBER
+ENV VITE_TWILIO_TO_NUMBER=${VITE_TWILIO_TO_NUMBER}
+
+RUN npm run build
+
+FROM nginx:alpine
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 5173
+
+CMD ["nginx", "-g", "daemon off;"]
