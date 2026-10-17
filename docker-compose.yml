@@ -1,0 +1,127 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:8000
+        - VITE_RAZORPAY_KEY=${VITE_RAZORPAY_KEY}
+        - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+        - VITE_TWILIO_ACCOUNT_SID=${VITE_TWILIO_ACCOUNT_SID}
+        - VITE_TWILIO_AUTH_TOKEN=${VITE_TWILIO_AUTH_TOKEN}
+        - VITE_TWILIO_FROM_NUMBER=${VITE_TWILIO_FROM_NUMBER}
+        - VITE_TWILIO_TO_NUMBER=${VITE_TWILIO_TO_NUMBER}
+    image: citadel-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://backend:8000
+    env_file: .env
+    depends_on:
+      - backend
+    networks:
+      - citadel
+    restart: unless-stopped
+
+  backend:
+    user: root
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: citadel-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      # Host Docker socket — mounted so the Fabric client can invoke the
+      # `cli` container (`docker exec cli peer chaincode ...`) and the
+      # SIM-swap fast path queries the LIVE Hyperledger ledger, not just the
+      # Redis cache. fabric_client degrades gracefully when docker is not
+      # reachable (e.g. on Render, where Fabric cannot run), so the same image
+      # works locally (on-chain) and on cloud (Redis-cached fallback).
+      # SECURITY: this grants host-root-equivalent power to the backend
+      # container. Only acceptable for the local demo; do NOT enable on an
+      # internet-facing deployment — run a dedicated fabric-gateway sidecar
+      # there instead.
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - citadel
+    restart: unless-stopped
+
+  ml:
+    build:
+      context: ./ml
+      dockerfile: Dockerfile
+    image: citadel-ml
+    ports:
+      - "8001:8001"
+    volumes:
+      # Bind-mount only — host ml/models is /app/models, so trained .pth weights
+      # dropped in ml/models are picked up directly (no named-volume shadowing).
+      - ./ml:/app
+    env_file: .env
+    networks:
+      - citadel
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-citadel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-citadel_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-citadel}
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-citadel}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - citadel
+    restart: unless-stopped
+
+  camara:
+    build:
+      context: ./camara
+      dockerfile: Dockerfile
+    image: citadel-camara
+    ports:
+      - "8002:8002"
+    networks:
+      - citadel
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - citadel
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  citadel:
+    driver: bridge
