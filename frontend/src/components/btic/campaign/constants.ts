@@ -1,0 +1,16 @@
+export const STATUS_COLORS: Record<string, string> = {
+  ACTIVE: "#B3261E",
+  INVESTIGATING: "#B7791F",
+  CONTAINED: "#3D8B5A",
+  RESOLVED: "#706C69",
+};
+
+export const TYPE_COLORS: Record<string, string> = {
+  SIM_SWAP: "#B3261E",
+  CREDENTIAL_THEFT: "#B7791F",
+  COERCION: "#B8920F",
+  MONEY_MULE: "#8E5BA8",
+  BEHAVIORAL_ANOMALY: "#2C7A91",
+  MERCHANT_ABUSE: "#3D8B5A",
+  IDENTITY_MISMATCH: "#5B5BA8",
+};
