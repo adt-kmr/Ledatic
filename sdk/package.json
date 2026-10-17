@@ -1,0 +1,15 @@
+{
+  "name": "@citadel/sdk",
+  "version": "1.0.0",
+  "description": "Citadel Web Signal Capture SDK",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}
