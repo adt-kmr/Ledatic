@@ -1,0 +1,44 @@
+# Vercel's Hobby plan only builds commits whose author is the Hobby team owner
+# (https://vercel.com/docs/deployments/troubleshoot-project-collaboration), so a
+# push from any other contributor never reaches production — the site silently
+# stays on the owner's last commit. This deploys with the owner's access token
+# instead of through the Git integration, and a token carries no author check.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   VERCEL_TOKEN       vercel.com/account/tokens — created by the project owner
+#   VERCEL_ORG_ID      from .vercel/project.json after `vercel link`
+#   VERCEL_PROJECT_ID  from .vercel/project.json after `vercel link`
+#
+# `vercel pull` fetches the project's production env vars first, so the VITE_*
+# values get inlined into the bundle exactly as they are today. Building here
+# rather than on Vercel also keeps the deploy off the Hobby build quota.
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # Guarded so forks without the secrets skip quietly instead of failing
+      # every push with a red X.
+      - name: Build and deploy
+        if: env.VERCEL_TOKEN != ''
+        run: |
+          npm install --global vercel@latest
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel build --prod --token="$VERCEL_TOKEN"
+          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
