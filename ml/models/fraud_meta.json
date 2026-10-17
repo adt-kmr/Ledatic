@@ -1,0 +1,22 @@
+{
+  "feature_names": [
+    "log_amount",
+    "hour",
+    "is_transfer",
+    "dest_indegree",
+    "payer_outdeg",
+    "amount_vs_payer_avg",
+    "recipient_novelty",
+    "is_round_amt",
+    "is_odd_hour",
+    "payee_unique_senders",
+    "amount_zscore_payer",
+    "payer_payee_concentration",
+    "log_dest_indegree"
+  ],
+  "operating_threshold": 0.9702823563709737,
+  "scale_pos_weight": 558.4926108374384,
+  "split": "temporal",
+  "train_cut_step": 67,
+  "val_cut_step": 81
+}
