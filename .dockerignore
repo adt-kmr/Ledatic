@@ -1,0 +1,12 @@
+node_modules
+.next
+dist
+coverage
+.git
+.env.local
+.env.production
+.vscode
+.idea
+*.log
+__pycache__
+*.pyc
