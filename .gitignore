@@ -1,0 +1,71 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+sdk/node_modules/
+.next/
+# Build outputs
+frontend/dist/
+*.pyc
+__pycache__/
+*.pyo
+.pytest_cache/
+
+# Environment
+.env
+.env.*
+!.env.example
+frontend/.env.local
+
+# copod_anomaly.pkl is now COMMITTED: COPOD is fit on a 40k-row subsample
+# (train_fraud.py) so the artifact is ~21 MB — small enough for Git and, crucially,
+# so prod (Render, which never runs the boot-time regen) loads it directly and
+# txn_fraud_ready=true. The PaySim raw CSV stays committed for local retraining.
+# Curated .npz subsets and the Colab bundle stay ignored.
+ml/data/*
+!ml/data/PS_20174392719_1491204439457_log.csv
+# Colab upload bundle (contains data subsets — never push)
+ml/citadel_train.zip
+# Tooling venv already covered below
+# generated training plots (kept small; metrics_*.json reports ARE tracked)
+
+# Blockchain crypto material (contains private keys)
+blockchain/crypto-config/
+crypto-config/
+blockchain/channel-artifacts/
+channel-artifacts/
+blockchain/bin/
+
+# Go vendor directories (contain third-party code with secrets like webhook URLs)
+blockchain/chaincode/*/vendor/
+
+# Compiled Go chaincode binaries
+blockchain/chaincode/hash_registrar/hash_registrar
+blockchain/chaincode/mismatch_detector/mismatch_detector
+blockchain/chaincode/mule_detector/mule_detector
+blockchain/builders/ccaas/bin/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tooling venv (kaggle CLI)
+ml/.venv-tools/
+ml/catboost_info/
+ml/datasets.tar.gz
+
+# AI Agents
+.ai-agents/
+.vercel
+
+sdk-android/.gradle/
+sdk-android/build/
+backend/logs/
+
+# Backend dev-only generated secrets
+backend/.dev_secrets.json
+.env*
+dump.rdb
