@@ -72,7 +72,7 @@ function BrandPanel() {
         </dl>
       </div>
 
-      <p className="cc-mono relative m-0 !text-[11px] text-white/50">Derby Hackathon 2026 · Team Incognito</p>
+      <p className="cc-mono relative m-0 !text-[11px] text-white/50">IBM Z Datathon 2026 · Secure &amp; privacy-aware AI</p>
     </aside>
   );
 }

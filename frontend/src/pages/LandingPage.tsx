@@ -820,17 +820,17 @@ export default function LandingPage() {
                 <span className="cc-ping absolute inline-flex h-full w-full rounded-full bg-[#7FD49A] opacity-70" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[#7FD49A]" />
               </span>
-              Derby Hackathon 2026
+              IBM Z Datathon 2026
             </span>
             <p className="m-0 mt-4 max-w-[340px] text-[13px] leading-[1.5] text-white/70">
-              Organized by University of Derby, UK · Technically supported by the American Society for Engineers
+              Theme: Secure &amp; privacy-aware AI · Built by Apoorv, Keha, Aditya, Vanshika, Harshdeep and Parth
             </p>
           </div>
           <div className="grid grid-cols-2 gap-10 md:grid-cols-3" style={{ borderLeft: "1px solid rgba(255,255,255,.2)" }}>
             {[
               { h: "Platform", l: [["Bank demo", "/demo/bank"], ["FIU console", "/admin"], ["Phishing demo", "/phishing-demo"], ["Platforms", "/demo/platforms"]] },
               { h: "Pathways", l: [["Device trust", "#platform"], ["Coercion", "#platform"], ["Behavioral ML", "#platform"], ["Investigator", "#explore"]] },
-              { h: "Developers", l: [["Docs", "/doc"], ["API reference", "/doc"], ["Security", "#security"], ["GitHub", "https://github.com/HarshdeepAthawale/Derby-Hack"]] },
+              { h: "Developers", l: [["Docs", "/doc"], ["API reference", "/doc"], ["Security", "#security"], ["GitHub", "https://github.com/adt-kmr/Ledatic"]] },
             ].map((col) => (
               <div key={col.h} className="pl-8 md:pl-10">
                 <h3 className="m-0 mb-6 text-[17px] font-normal text-white">{col.h}</h3>
