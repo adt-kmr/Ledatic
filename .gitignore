@@ -14,6 +14,8 @@ __pycache__/
 .env
 .env.*
 !.env.example
+!frontend/.env.example
+!backend/.env.example
 frontend/.env.local
 
 # copod_anomaly.pkl is now COMMITTED: COPOD is fit on a 40k-row subsample
@@ -70,3 +72,9 @@ backend/.dev_secrets.json
 .env*
 dump.rdb
 .local/
+
+
+# Frontend environment files (never commit secrets)
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
