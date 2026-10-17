@@ -4,7 +4,6 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=http://localhost:8000
         - VITE_RAZORPAY_KEY=${VITE_RAZORPAY_KEY}
         - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
         - VITE_TWILIO_ACCOUNT_SID=${VITE_TWILIO_ACCOUNT_SID}
@@ -15,7 +14,6 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://backend:8000
     env_file: .env
     depends_on:
       - backend
