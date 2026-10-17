@@ -1,0 +1,33 @@
+# Crypto config for the LinuxONE (s390x) Fabric deployment.
+# Mirrors blockchain/network/crypto-config.yaml but documents the s390x /
+# Crypto Express specifics. Not used by the default network.
+
+OrdererOrgs:
+  - Name: Orderer
+    Domain: example.com
+    Specs:
+      - Hostname: orderer
+        SANS:
+          - localhost
+    Template:
+      Count: 1
+
+PeerOrgs:
+  - Name: Org1
+    Domain: org1.example.com
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+    # On LinuxONE, peer identities are generated inside Crypto Express (PKCS#11)
+    # instead of as software keys. The CA runs as a Secure Execution guest.
+    CryptoExpress:
+      Enabled: true
+      Provider: PKCS11
+      Library: /usr/lib/pkcs11/libpkcs11.so
+      Slot: 0
+    SecureExecution:
+      Enabled: true
+      Measurement: "0x" + "0" * 64
+    Architecture: s390x
