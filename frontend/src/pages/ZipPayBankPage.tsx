@@ -38,6 +38,7 @@ import {
 import { BehaviorSDK, getDeviceFingerprint } from "../lib/sdk/BehaviorSDK";
 import { apiUrl, setToken, getToken, setSession, API_BASE, getPublicIp, loginCustomer, LoginError, ensureDemoToken } from "../lib/auth";
 import HoneyTrap from "../components/HoneyTrap";
+import PauseScreen from "../components/PauseScreen";
 import { securityEvaluate } from "../lib/securityApi";
 import { useMotionSignal } from "../lib/useMotionSignal";
 import jsQR from "jsqr";
@@ -5250,7 +5251,9 @@ export default function ZipPayBankPage() {
         )}
         {/* Render overlay on login page too if block occurs */}
         <AnimatePresence>
-          {overlay && (
+          {overlay?.type === "STEP_UP" && !overlay.reason.includes("Transaction Submitted Successfully") ? (
+            <PauseScreen key="pause" reason={overlay.reason} score={overlay.score} onContinue={() => { fetch(apiUrl("/api/auth/demo/reset"), { method: "POST" }).catch(() => {}); closeOverlay(); }} onStop={() => { addEv("warn", "Customer reported being guided by a caller — payment stopped"); fetch(apiUrl("/api/auth/demo/reset"), { method: "POST" }).catch(() => {}); closeOverlay(); }} />
+          ) : overlay && (
             <motion.div key="overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(255, 255, 255,0.88)", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(16px)" }}>
               <motion.div initial={{ scale: 0.85, y: 28 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0 }}
@@ -6384,7 +6387,9 @@ export default function ZipPayBankPage() {
 
       {/* ── Decision Overlays ──────────────────────────────────────────────── */}
       <AnimatePresence>
-        {overlay && (
+        {overlay?.type === "STEP_UP" && !overlay.reason.includes("Transaction Submitted Successfully") ? (
+          <PauseScreen key="pause" reason={overlay.reason} score={overlay.score} onContinue={() => { closeOverlay(); }} onStop={() => { addEv("warn", "Customer reported being guided by a caller — payment stopped"); closeOverlay(); }} />
+        ) : overlay && (
           <motion.div key="overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{
               position: "fixed", inset: 0, zIndex: 200,

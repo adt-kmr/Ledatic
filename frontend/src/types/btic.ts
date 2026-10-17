@@ -268,6 +268,7 @@ export type NavItem =
   | "graph"
   | "investigate"
   | "analytics"
+  | "ibm-z"
   | "settings";
 
 // ── Indian Geography ──────────────────────────────────────────────────────────

@@ -122,6 +122,63 @@ async def deception_status(request: Request):
     }
 
 
+# ── Crypto-agility inventory (FIU / CISO quantum-readiness view) ──────────────
+
+# Static, hand-maintained list of the algorithms Citadel endpoints use today.
+# quantum_safe: "yes" (NIST PQC or symmetric/hash at >=128-bit post-quantum
+# strength), "no" (broken by Shor on a CRQC), "partial" (safe only if key size
+# or construction is reviewed). hsm_target is the IBM Crypto Express home for
+# the key in the LinuxONE deployment; it is a design target, not running here.
+_CRYPTO_INVENTORY = [
+    {"id": "verdict-sig", "asset": "Verdict signatures", "endpoint": "/api/security/evaluate",
+     "algorithm": "ML-DSA-65 (FIPS 204)", "purpose": "Sign risk verdicts", "quantum_safe": "yes",
+     "key_custody": "software", "hsm_target": "Crypto Express (EP11) - ML-DSA key"},
+    {"id": "session-kem", "asset": "Key encapsulation", "endpoint": "/api/security/pqc/pubkey",
+     "algorithm": "ML-KEM-768 (FIPS 203)", "purpose": "Harvest-now-decrypt-later protection", "quantum_safe": "yes",
+     "key_custody": "software", "hsm_target": "Crypto Express (EP11) - ML-KEM key"},
+    {"id": "imei-hmac", "asset": "Device-ID hash", "endpoint": "/api/auth/login",
+     "algorithm": "HMAC-SHA-256", "purpose": "On-device IMEI hashing, SIM-swap check", "quantum_safe": "yes",
+     "key_custody": "software", "hsm_target": "Crypto Express - HMAC salt"},
+    {"id": "jwt", "asset": "Session tokens", "endpoint": "/api/auth/*, /api/admin/*",
+     "algorithm": "JWT HS256", "purpose": "Customer and analyst sessions", "quantum_safe": "yes",
+     "key_custody": "software", "hsm_target": "Crypto Express - signing key"},
+    {"id": "password", "asset": "Password storage", "endpoint": "/api/auth/register",
+     "algorithm": "bcrypt", "purpose": "Credential hashing", "quantum_safe": "yes",
+     "key_custody": "n/a", "hsm_target": None},
+    {"id": "zk-passport", "asset": "zk-SNARK passport", "endpoint": "/api/security/zkp/verify",
+     "algorithm": "Groth16 over BN254", "purpose": "Cross-bank trust without biometric leakage", "quantum_safe": "no",
+     "key_custody": "public params", "hsm_target": None,
+     "note": "Pairing-based; plan hash-based STARK or lattice proof."},
+    {"id": "eth-anchor", "asset": "Public ledger anchoring", "endpoint": "/api/blockchain/*",
+     "algorithm": "ECDSA secp256k1", "purpose": "Optional Ethereum anchoring of verdict hashes", "quantum_safe": "no",
+     "key_custody": "software", "hsm_target": None,
+     "note": "Replace with private Fabric channel anchoring."},
+    {"id": "fabric-identity", "asset": "Fabric peer identities", "endpoint": "blockchain/*",
+     "algorithm": "ECDSA P-256", "purpose": "Peer and admin identities, TLS", "quantum_safe": "no",
+     "key_custody": "software", "hsm_target": "Crypto Express (PKCS#11) - peer identities",
+     "note": "HSM-backed today-safe; migrate to PQC certs when Fabric supports them."},
+    {"id": "transport", "asset": "Transport", "endpoint": "all services",
+     "algorithm": "TLS 1.2/1.3 (ECDHE)", "purpose": "In-flight encryption", "quantum_safe": "partial",
+     "key_custody": "terminator", "hsm_target": None,
+     "note": "Enable hybrid X25519+ML-KEM groups at the TLS terminator."},
+]
+
+
+@router.get("/crypto-inventory")
+async def crypto_inventory(
+    caller: AuthUser = Depends(require_role("fiu_admin", "bank_analyst")),
+):
+    """Machine-readable algorithm inventory with quantum-safety flags."""
+    items = _CRYPTO_INVENTORY
+    summary = {
+        "total": len(items),
+        "quantum_safe": sum(1 for i in items if i["quantum_safe"] == "yes"),
+        "partial": sum(1 for i in items if i["quantum_safe"] == "partial"),
+        "at_risk": sum(1 for i in items if i["quantum_safe"] == "no"),
+    }
+    return {"summary": summary, "items": items}
+
+
 # ── Phase 3: PQC Shield — ML-KEM-768 key encapsulation ────────────────────────
 
 @router.get("/pqc/pubkey")

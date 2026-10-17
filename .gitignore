@@ -69,3 +69,4 @@ backend/logs/
 backend/.dev_secrets.json
 .env*
 dump.rdb
+.local/

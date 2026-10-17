@@ -17,6 +17,7 @@ import {
   Search,
   BarChart3,
   Settings,
+  Cpu,
   Shield,
   AlertTriangle,
   Users,
@@ -121,6 +122,7 @@ export function CommandPalette() {
       nav("Mind Map", "/admin/graph", <Network size={15} />, ["mind map", "graph", "identity", "node", "edge"]),
       nav("Investigation", "/admin/investigate", <Search size={15} />, ["investigate", "search", "lookup"]),
       nav("Analytics", "/admin/analytics", <BarChart3 size={15} />, ["analytics", "chart", "trend"]),
+      nav("IBM Z trust", "/admin/ibm-z", <Cpu size={15} />, ["ibm", "linuxone", "quantum", "crypto", "hsm"]),
       nav("Settings", "/admin/settings", <Settings size={15} />, ["settings", "config", "threshold"]),
 
       // Map layers (with Alt+1-5 shortcuts)

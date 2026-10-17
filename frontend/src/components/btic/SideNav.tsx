@@ -11,6 +11,7 @@ import {
   FileWarning,
   Siren,
   Radar,
+  Cpu,
 } from "lucide-react";
 import type { NavItem } from "../../types/btic";
 
@@ -43,7 +44,10 @@ export const NAV_GROUPS: { title: string; items: Item[] }[] = [
   },
   {
     title: "System",
-    items: [{ id: "settings", label: "Settings", icon: Settings, path: "/admin/settings" }],
+    items: [
+      { id: "ibm-z", label: "IBM Z trust", icon: Cpu, path: "/admin/ibm-z" },
+      { id: "settings", label: "Settings", icon: Settings, path: "/admin/settings" },
+    ],
   },
 ];
 
