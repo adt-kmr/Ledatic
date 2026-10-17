@@ -11,7 +11,7 @@ const TEAL = "#083241";
 // Judges need a way in: this is the same account the repo's render.yaml and
 // docs already publish. Flip to false to hide the shortcut.
 const SHOW_DEMO_ACCESS = true;
-const DEMO_ACCOUNT = { id: "ADMIN", password: "Citadel@Ops#2026", name: "FIU Administrator", note: "Full authority" };
+const DEMO_ACCOUNT = { id: "ADMIN", password: "ADMIN", name: "FIU Administrator", note: "Full authority" };
 
 const FACTS = [
   ["<80 ms", "Decision latency on the device-trust path"],
