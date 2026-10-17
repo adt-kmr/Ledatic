@@ -842,7 +842,7 @@ export default function LandingPage() {
               IBM Z Datathon 2026
             </span>
             <p className="m-0 mt-4 max-w-[340px] text-[13px] leading-[1.5] text-white/70">
-              Theme: Secure &amp; privacy-aware AI · Built by Apoorv, Keha, Aditya, Vanshika, Harshdeep and Parth
+               Theme: Secure &amp; privacy-aware AI · Built by Aditya Kumar, Apoorv Singhal, Keha Chopra, Vanshika Khurana, Harshdeep Athawale and Parth Deshmukh
             </p>
           </div>
           <div className="grid grid-cols-2 gap-10 md:grid-cols-3" style={{ borderLeft: "1px solid rgba(255,255,255,.2)" }}>
@@ -867,7 +867,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="cc-edge flex flex-wrap justify-between gap-4 pb-10 text-[13px] text-white/60">
-          <span>Team Incognito — Harshdeep Athawale · Prabinder Singh · Danish Dhanjal · Kyna Sood · Anish Grover</span>
+          <span>Team Vincentius — Aditya Kumar · Apoorv Singhal · Keha Chopra · Vanshika Khurana · Harshdeep Athawale · Parth Deshmukh</span>
           <span className="cc-mono !text-[11px]">Synthetic & public data only</span>
         </div>
         <div className="pointer-events-none select-none overflow-hidden">
