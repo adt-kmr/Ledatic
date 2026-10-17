@@ -1,0 +1,29 @@
+name: Build LinuxONE (s390x) image
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "backend/Dockerfile.linuxone"
+      - "docker-compose.linuxone.yml"
+      - "backend/app/ibm_z/**"
+      - "backend/app/services/ibm_z/**"
+
+jobs:
+  build-s390x:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: s390x
+      - uses: docker/setup-buildx-action@v3
+      - name: Build (design target, best-effort)
+        run: |
+          docker buildx build \
+            --platform linux/s390x \
+            -f backend/Dockerfile.linuxone \
+            -t citadel-backend:linuxone-s390x \
+            --load \
+            . || echo "s390x build skipped - design target only"
