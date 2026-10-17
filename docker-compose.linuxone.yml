@@ -1,0 +1,92 @@
+# docker-compose.linuxone.yml - LinuxONE deployment topology (design target)
+#
+# Usage:
+#   docker compose -f docker-compose.linuxone.yml up
+#
+# This file mirrors docker-compose.yml but documents the s390x / LinuxONE
+# specifics (multi-arch images, Crypto Express device, Secure Execution guests).
+# It is NOT referenced by the default docker-compose.yml.
+
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.linuxone
+    image: citadel-backend:linuxone-s390x
+    platform: linux/s390x
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: production
+      CRYPTO_EXPRESS_PKCS11_LIB: /usr/lib/pkcs11/libpkcs11.so
+      CRYPTO_EXPRESS_SLOT: "0"
+      LLAMA_LINUXONE_URL: http://llama:8080/v1
+      LLAMA_LINUXONE_MODEL: llama-3.3-70b-instruct
+    devices:
+      - /dev/crypto_express:/dev/crypto_express  # Crypto Express passthrough
+    depends_on:
+      - postgres
+      - redis
+      - fabric-peer
+      - llama
+
+  ml:
+    image: citadel-ml:linuxone-s390x
+    platform: linux/s390x
+    ports:
+      - "8001:8001"
+    environment:
+      TELUM_ENABLED: "true"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: telum
+              count: 1
+              capabilities: [gpu]  # Telum accelerator advertised as a device
+
+  fabric-peer:
+    image: hyperledger/fabric-peer:2.5
+    platform: linux/s390x
+    environment:
+      CORE_PEER_ID: peer0.org1.example.com
+      CORE_PEER_ADDRESS: peer0.org1.example.com:7051
+      CORE_PEER_LOCALMSPID: Org1MSP
+      CORE_PEER_MSPCONFIGPATH: /etc/hyperledger/fabric/msp
+    volumes:
+      - ./blockchain/crypto-config:/etc/hyperledger/fabric/msp
+
+  postgres:
+    image: postgres:15
+    platform: linux/s390x
+    environment:
+      POSTGRES_USER: citadel
+      POSTGRES_PASSWORD: citadel
+      POSTGRES_DB: citadel
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    platform: linux/s390x
+    ports:
+      - "6379:6379"
+
+  llama:
+    image: ghcr.io/ggerganov/llama.cpp:server
+    platform: linux/s390x
+    ports:
+      - "8080:8080"
+    command: ["--model", "/models/llama-3.3-70b-instruct-q4.gguf", "--port", "8080"]
+    volumes:
+      - ./ml/models:/models:ro
+
+volumes:
+  postgres-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /var/lib/citadel/postgres  # protected-key volume on LinuxONE
