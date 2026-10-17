@@ -22,6 +22,7 @@ const FraudGraphPage = lazy(() => import("../../pages/admin/FraudGraphPage"));
 const InvestigationPage = lazy(() => import("../../pages/admin/InvestigationPage"));
 const AnalyticsPage = lazy(() => import("../../pages/admin/AnalyticsPage"));
 const SettingsPage = lazy(() => import("../../pages/admin/SettingsPage"));
+const IbmTrustPage = lazy(() => import("../../pages/admin/IbmTrustPage"));
 
 function PageSkeleton() {
   return (
@@ -97,6 +98,7 @@ const PAGE_META: Record<string, { kicker: string; title: string; desc: string }>
   graph: { kicker: "Investigate", title: "Fraud mind map", desc: "Accounts, devices and payees linked into the networks behind each campaign." },
   investigate: { kicker: "Investigate", title: "Investigation workspace", desc: "Pull a session apart: signals, SHAP attribution, device history and ledger proof." },
   analytics: { kicker: "Investigate", title: "Analytics", desc: "Detection performance, decision mix and trends across the protected population." },
+  "ibm-z": { kicker: "System", title: "IBM Z trust boundary", desc: "How Citadel maps onto LinuxONE hardware security, and how ready its cryptography is for the quantum era." },
   settings: { kicker: "System", title: "Settings", desc: "Risk thresholds, alerting and operator preferences for this console." },
 };
 
@@ -166,6 +168,7 @@ export default function CommandCenterLayout({
                   <Route path="graph" element={<FraudGraphPage />} />
                   <Route path="investigate" element={<InvestigationPage />} />
                   <Route path="analytics" element={<AnalyticsPage />} />
+                  <Route path="ibm-z" element={<IbmTrustPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="*" element={<Navigate to="/admin" replace />} />
                 </Routes>
