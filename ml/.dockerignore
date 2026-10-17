@@ -1,0 +1,26 @@
+# DO NOT re-add `models/` here — it holds the trained weights.
+#
+# Locally, docker-compose bind-mounts ./ml:/app so the image copy is irrelevant.
+# But on Render (Dockerfile build, no bind mount) the IMAGE is the only source
+# of these files. Excluding models/ ships an ML container with NO trained
+# weights — BehaveFormer/Siamese/CNN-LSTM silently fall back to RANDOM INIT.
+# The trained weights (.pth/.json/.joblib, ~6MB) are git-tracked, so bake them in.
+#
+# `data/` (the 71MB PaySim CSV) IS excluded on purpose: if present, ensure_models.sh
+# regenerates COPOD via train_fraud.py at boot, which OOMs the 512MB free tier
+# (confirmed: "Out of memory (used over 512Mi)"). Without the CSV, COPOD regen is
+# skipped and the container starts cleanly with the real behavioral weights loaded.
+# Transaction-fraud (COPOD) stays disabled on free tier — acceptable; the biometric
+# models are what matter. To enable it, use a >=2GB plan and drop this exclusion.
+data/
+reports/plots/
+
+# Python caches / tooling
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv-tools/
+catboost_info/
+datasets.tar.gz
+citadel_train.zip
