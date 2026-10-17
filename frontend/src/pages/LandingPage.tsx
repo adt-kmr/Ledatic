@@ -580,7 +580,7 @@ export default function LandingPage() {
           <div className="flex flex-col justify-between pl-0 lg:border-l lg:pl-9" style={{ borderColor: C.w2 }}>
             <div>
               <Reveal>
-                <a href="#platform" className="text-[15px] underline underline-offset-4" style={{ color: C.w6 }}>Citadel, built for Indian digital banking</a>
+                <a href="#platform" className="text-[15px] underline underline-offset-4" style={{ color: C.w6 }}>Citadel sees the scam pattern, even when the password and OTP are real</a>
               </Reveal>
               <Reveal delay={0.08}>
                 <h1 className="cc-serif m-0 mt-5 text-[clamp(40px,5.4vw,76px)] leading-[1.02] tracking-[-0.025em]" style={{ textWrap: "balance" }}>
@@ -771,6 +771,25 @@ export default function LandingPage() {
                 <div className="flex items-baseline gap-6 border-t pt-6 md:block" style={{ borderColor: C.w2 }}>
                   <span className="cc-serif block text-[48px] leading-none">{m.v}</span>
                   <span className="mt-3 block max-w-[260px] text-[15px]" style={{ color: C.w6 }}>{m.l}</span>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+
+        {/* Privacy-first, designed for IBM LinuxONE */}
+        <div id="privacy" className="cc-edge cc-section-y !pt-0">
+          <Reveal><h2 className="cc-serif m-0 mb-10 max-w-[900px] text-[clamp(32px,3.6vw,52px)] leading-[1.04] tracking-[-0.015em]">AI value without exposing identities, biometrics or customer data.</h2></Reveal>
+          <div className="grid gap-8 md:grid-cols-3">
+            {[
+              { h: "Raw identifiers never leave the device", d: "IMEI is hashed on the phone. Banks share only hashes of flagged mule accounts, so no personal data goes on the ledger." },
+              { h: "Quantum-safe, explainable verdicts", d: "Verdicts are signed with ML-DSA and every decision carries its top SHAP reasons for audit." },
+              { h: "Designed for IBM LinuxONE", d: "Built to run inside the bank's trust boundary: Telum inference, Crypto Express keys and Secure Execution. See the deployment targets in the FIU console." },
+            ].map((x, k) => (
+              <Reveal key={x.h} delay={k * 0.08}>
+                <div className="border-t pt-6" style={{ borderColor: C.w2 }}>
+                  <h3 className="cc-serif m-0 text-[24px] font-normal leading-[1.1]">{x.h}</h3>
+                  <p className="m-0 mt-3 max-w-[340px] text-[15px] leading-[1.5]" style={{ color: C.w6 }}>{x.d}</p>
                 </div>
               </Reveal>
             ))}
