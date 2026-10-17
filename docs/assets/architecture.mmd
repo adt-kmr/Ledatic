@@ -1,0 +1,96 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontSize": "18px",
+    "fontFamily": "arial",
+    "primaryColor": "#e8f4fc",
+    "primaryBorderColor": "#1e6fa8",
+    "lineColor": "#334155",
+    "clusterBkg": "#f8fafc",
+    "clusterBorder": "#94a3b8"
+  },
+  "flowchart": {
+    "nodeSpacing": 45,
+    "rankSpacing": 55,
+    "padding": 18,
+    "htmlLabels": true
+  }
+}}%%
+
+flowchart TB
+    subgraph L1["① Client"]
+        direction LR
+        SDK["BehaviorSDK<br/><b>40+ signals</b> · 500 ms flush<br/>IMEI hashed on device"]
+        UI["React 18 UI<br/>Bank demo · FIU console"]
+    end
+
+    SDK -->|signal bundle| ENGINE
+    UI --> ENGINE
+
+    ENGINE{{"<b>Decision Engine</b> :8000<br/>Fuse → score 0–1000"}}
+
+  subgraph PATHS["Three parallel pathways"]
+        direction LR
+
+        subgraph P1["Pathway 1 · Device trust"]
+            direction TB
+            P1L["&lt; 80 ms"]
+            RD[("Redis<br/>IMEI cache")]
+            MD["MismatchDetector<br/>+ MuleDetector"]
+            P1L --> RD --> MD
+        end
+
+        subgraph P2["Pathway 2 · Coercion"]
+            direction TB
+            P2L["concurrent"]
+            COER["Screen-share · Paste<br/>Hesitation"]
+            CM["CAMARA<br/>SIM-port"]
+            P2L --> COER
+            COER --> CM
+        end
+
+        subgraph P3["Pathway 3 · Machine learning"]
+            direction TB
+            P3L["&lt; 150 ms"]
+            BF["BehaveFormer + Siamese"]
+            CL["CNN-LSTM drift"]
+            XG["XGBoost + COPOD"]
+            RS["RiskScorer + SHAP"]
+            P3L --> BF --> RS
+            CL --> RS
+            XG --> RS
+        end
+    end
+
+    ENGINE --> P1
+    ENGINE --> P2
+    ENGINE --> P3
+    RS -->|risk + SHAP| ENGINE
+    MD -->|IMEI / mule flags| ENGINE
+    CM -->|telecom risk| ENGINE
+    COER -->|coercion score| ENGINE
+
+    DEC{{"APPROVE · STEP_UP · HARD_BLOCK"}}
+
+    ENGINE --> DEC
+
+    subgraph POST["After decision"]
+        direction LR
+        AGENT["Groq investigator<br/>HARD_BLOCK only"]
+        PG[("PostgreSQL")]
+        ETH["Fabric ledger<br/>+ optional Sepolia"]
+    end
+
+    DEC -->|HARD_BLOCK| AGENT
+    DEC --> PG
+    AGENT --> PG
+    MD -.->|audit| ETH
+
+    classDef engine fill:#dbeafe,stroke:#1d4ed8,stroke-width:2px
+    classDef pathway fill:#f0fdf4,stroke:#16a34a,stroke-width:1px
+    classDef ml fill:#fef3c7,stroke:#d97706,stroke-width:1px
+    classDef block fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+    class ENGINE,DEC engine
+    class P1,P2 pathway
+    class P3,BF,CL,XG,RS ml
+    class MD block
