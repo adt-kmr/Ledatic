@@ -17,11 +17,17 @@ from typing import Any
 
 import numpy as np
 
-from .behaveformer import BehaveFormerEncoder
-from .cnn_lstm import SessionDriftDetector
+try:
+    from .behaveformer import BehaveFormerEncoder
+    from .cnn_lstm import SessionDriftDetector
+    from .siamese import SiameseSimilarityScorer
+    TORCH_MODELS = True
+except ImportError:  # torch unavailable (e.g. s390x): neutral stand-ins
+    from .torch_stubs import BehaveFormerEncoder, SessionDriftDetector, SiameseSimilarityScorer
+    TORCH_MODELS = False
+
 from .feature_engine import build_keystroke_sequence, build_mouse_sequence, extract_features
 from .risk_scorer import RiskScorer
-from .siamese import SiameseSimilarityScorer
 
 logger = logging.getLogger(__name__)
 

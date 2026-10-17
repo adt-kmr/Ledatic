@@ -1,25 +1,27 @@
-FROM python:3.11-slim
+FROM ubuntu:22.04
 
+ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc libpq-dev curl ca-certificates \
+    python3 python3-dev python3-venv python3-pip \
+    build-essential gfortran pkg-config libopenblas-dev cmake ninja-build \
+    llvm-15-dev libjpeg-dev zlib1g-dev libfreetype6-dev libpng-dev libtiff-dev libwebp-dev \
+    libffi-dev libssl-dev libpq-dev curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Docker CLI — the Fabric client reaches the network via
-# `docker exec cli peer chaincode ...` (no stable Python SDK exists for
-# Fabric 2.5). The socket is bind-mounted in docker-compose, but the client
-# binary must exist in the image or every chaincode call silently degrades
-# to the off-chain path. CLI only; no daemon runs here.
-RUN curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-24.0.7.tgz \
-      -o /tmp/docker.tgz \
-    && tar -xzf /tmp/docker.tgz -C /tmp \
-    && mv /tmp/docker/docker /usr/local/bin/docker \
-    && chmod +x /usr/local/bin/docker \
-    && rm -rf /tmp/docker /tmp/docker.tgz
+# current Rust (distro rustc is too old for orjson / tiktoken)
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+
+RUN python3 -m venv /opt/venv
+ENV PATH="/root/.cargo/bin:/opt/venv/bin:$PATH"
+ENV LLVM_CONFIG=/usr/bin/llvm-config-15
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip pip install --upgrade pip && \
+    pip install "setuptools<70" wheel numpy && \
+    pip install --no-build-isolation llvmlite==0.44.0
+RUN --mount=type=cache,target=/root/.cache/pip pip install --timeout 120 --retries 10 -r requirements.txt
 
 COPY . .
 
