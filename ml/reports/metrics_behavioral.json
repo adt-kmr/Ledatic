@@ -1,0 +1,30 @@
+{
+  "keystroke": {
+    "model": "BehaveFormer + Siamese head",
+    "dataset": "Aalto keystroke subset",
+    "n_users": 10000,
+    "split": "open-set (train 7000 / val 1500 / test 1500 disjoint users)",
+    "test_users": 1500,
+    "n_pairs": 25500,
+    "n_genuine": 18000,
+    "n_impostor": 7500,
+    "eer": 0.1231,
+    "roc_auc": 0.9441,
+    "tar_at_far_1pct": 0.6841
+  },
+  "mouse": {
+    "model": "CNN-LSTM",
+    "dataset": "Balabit mouse subset",
+    "n_windows": 26239,
+    "n_legit": 15347,
+    "n_illegal": 10892,
+    "roc_auc_in_sample": 0.7003,
+    "cv_roc_auc_mean": 0.70,
+    "split": "5-fold GroupKFold by session (CV); deployed weight trained on all data",
+    "note": "0.7003 is in-sample on the deployed weight; matches the reported 5-fold CV ROC-AUC ~0.70"
+  },
+  "device": "cpu",
+  "eval_only": true,
+  "smoke": false,
+  "note": "Numbers measured by evaluating the deployed weights in ml/models/ (Colab-trained, deployed 2026-06-24). Keystroke is a clean open-set test on 1500 disjoint users; matches the trainer's reported EER 0.14 / ROC-AUC 0.936."
+}

@@ -1,0 +1,132 @@
+{
+  "dataset": "PaySim (TRANSFER+CASH_OUT)",
+  "split": "temporal",
+  "features": [
+    "log_amount",
+    "hour",
+    "is_transfer",
+    "dest_indegree",
+    "payer_outdeg",
+    "amount_vs_payer_avg",
+    "recipient_novelty",
+    "is_round_amt",
+    "is_odd_hour",
+    "payee_unique_senders",
+    "amount_zscore_payer",
+    "payer_payee_concentration",
+    "log_dest_indegree"
+  ],
+  "feature_note": "Rich real-UPI-transferable features (log_amount, hour, is_transfer, dest_indegree, payer_outdeg, amount_vs_payer_avg, recipient_novelty, is_round_amt, is_odd_hour). Balance-reconciliation features excluded \u2014 they don't exist in real UPI logs and made synthetic fraud separable at ROC-AUC ~1.0.",
+  "anomaly_detector": "COPOD (PyOD)",
+  "train": {
+    "n": 454308,
+    "fraud": 812
+  },
+  "test": {
+    "n": 5916,
+    "fraud": 160
+  },
+  "xgboost": {
+    "threshold": 0.9702823563709737,
+    "precision": 0.5169491525423728,
+    "recall": 0.38125,
+    "f1": 0.43884892086330934,
+    "roc_auc": 0.8681229369353718,
+    "pr_auc": 0.3917215853641624,
+    "eer": 0.23193841209173033,
+    "eer_threshold": 0.23928208649158478,
+    "tar_at_far_1pct": 0.38125,
+    "tar_at_far_0.1pct": 0.1125,
+    "confusion_matrix": [
+      [
+        5699,
+        57
+      ],
+      [
+        99,
+        61
+      ]
+    ],
+    "n_pos": 160,
+    "n_total": 5916
+  },
+  "copod_anomaly": {
+    "threshold": 31.18366995674913,
+    "precision": 0.43333333333333335,
+    "recall": 0.1625,
+    "f1": 0.23636363636363636,
+    "roc_auc": 0.8073510250173732,
+    "pr_auc": 0.2509576073983232,
+    "eer": 0.2701463690062543,
+    "eer_threshold": 21.305573553650888,
+    "tar_at_far_1pct": 0.19375,
+    "tar_at_far_0.1pct": 0.08125,
+    "confusion_matrix": [
+      [
+        5722,
+        34
+      ],
+      [
+        134,
+        26
+      ]
+    ],
+    "n_pos": 160,
+    "n_total": 5916
+  },
+  "shap_top_features": [
+    {
+      "feature": "hour",
+      "mean_abs_shap": 1.521875262260437
+    },
+    {
+      "feature": "dest_indegree",
+      "mean_abs_shap": 1.0696731805801392
+    },
+    {
+      "feature": "log_amount",
+      "mean_abs_shap": 1.0662100315093994
+    },
+    {
+      "feature": "amount_vs_payer_avg",
+      "mean_abs_shap": 0.9182095527648926
+    },
+    {
+      "feature": "is_transfer",
+      "mean_abs_shap": 0.5142508745193481
+    },
+    {
+      "feature": "payee_unique_senders",
+      "mean_abs_shap": 0.1928206980228424
+    },
+    {
+      "feature": "is_odd_hour",
+      "mean_abs_shap": 0.07598934322595596
+    },
+    {
+      "feature": "log_dest_indegree",
+      "mean_abs_shap": 0.05243219807744026
+    },
+    {
+      "feature": "amount_zscore_payer",
+      "mean_abs_shap": 0.03668365254998207
+    },
+    {
+      "feature": "payer_payee_concentration",
+      "mean_abs_shap": 0.036297693848609924
+    },
+    {
+      "feature": "is_round_amt",
+      "mean_abs_shap": 0.0015692823799327016
+    },
+    {
+      "feature": "payer_outdeg",
+      "mean_abs_shap": 0.00066804961534217
+    },
+    {
+      "feature": "recipient_novelty",
+      "mean_abs_shap": 0.0
+    }
+  ],
+  "elapsed_sec": 13.6
+}
