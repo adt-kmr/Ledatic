@@ -1,0 +1,35 @@
+# Dockerfile.linuxone - multi-arch image for IBM LinuxONE (s390x)
+#
+# Build with:
+#   docker buildx build --platform linux/s390x -f backend/Dockerfile.linuxone -t citadel-backend:s390x .
+#
+# This image is a *design target*: it documents the s390x toolchain Citadel
+# would use on LinuxONE. It is not wired into the default docker-compose.yml.
+
+FROM --platform=linux/s390x python:3.11-slim
+
+WORKDIR /app
+
+# System dependencies available on the LinuxONE base image.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential libpq-dev libffi-dev libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python dependencies. On s390x, PyTorch / XGBoost / onnxruntime are pulled
+# from the IBM-provided wheels where available; otherwise the build falls back
+# to source builds (slow) or the x86 image.
+COPY backend/requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir --upgrade pip \
+ && pip install --no-cache-dir -r /app/requirements.txt
+
+# Optional IBM Z toolchain (best-effort; never fails the build).
+RUN pip install --no-cache-dir onnx onnxruntime 2>/dev/null || true
+
+COPY backend /app
+
+EXPOSE 8000
+
+# Secure Execution / Crypto Express are configured via environment variables:
+#   CRYPTO_EXPRESS_PKCS11_LIB, CRYPTO_EXPRESS_SLOT, CRYPTO_EXPRESS_PIN,
+#   LLAMA_LINUXONE_URL, LLAMA_LINUXONE_MODEL
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
