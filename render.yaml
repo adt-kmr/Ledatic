@@ -1,0 +1,84 @@
+# Render Blueprint — Citadel backend for Derby Hackathon 2026 (Team Incognito).
+# Everything runs on Render's free tier: the backend sleeps after 15 minutes
+# idle (first request after that takes ~50 s), and free Postgres expires after
+# 30 days. The PyTorch ML service is not deployed here — without it, logins
+# still run the device-trust and coercion pathways but the behavioral score
+# falls back to "approved with reduced confidence", and /api/fraud
+# transaction scoring returns 503.
+services:
+  # ── Backend (FastAPI) ─────────────────────────────────────────────────────
+  # Service name = Render hostname: this deploys to derby-hack.onrender.com,
+  # which is the backend origin the frontend falls back to (PROD_BACKEND_FALLBACK
+  # in frontend/src/lib/auth.ts) when VITE_API_URL is unset. Keep the two in sync.
+  - type: web
+    name: derby-hack
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      # numpy 1.26 has no wheels for Render's newer default Python.
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: derby-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: derby-redis
+          property: connectionString
+      # Per-commit Vercel preview hosts are also allowed via the regex in
+      # backend/main.py.
+      - key: CORS_ORIGINS
+        value: '["http://localhost:5173","http://localhost:5175","https://derby-hack.vercel.app"]'
+      - key: FRONTEND_URL
+        value: https://derby-hack.vercel.app
+      - key: FRONTEND_OAUTH_RETURN_PATH
+        value: /demo/bank
+      - key: JWT_SECRET
+        generateValue: true
+      - key: IMEI_HMAC_SECRET
+        generateValue: true
+      - key: INTERNAL_API_TOKEN
+        generateValue: true
+      # Optional: enables the AI investigator. Leave blank to use the fallback.
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CAMARA_MOCK_ENABLED
+        value: "true"
+      # FIU fraud-ops admin panel accounts — same demo credentials as before.
+      # Change the passwords in the Render dashboard for anything beyond judging.
+      - key: ADMIN_ACCOUNTS_JSON
+        value: '[{"id":"ADMIN","password":"Citadel@Ops#2026","name":"FIU Administrator","bank_id":"FIU","role":"fiu_admin"},{"id":"BANK","password":"Citadel@Bank#2026","name":"Bank Analyst","bank_id":"PSB","role":"bank_analyst"}]'
+      - key: DEMO_ACCOUNTS_JSON
+        value: '[{"id":"demo","password":"Demo@2026","name":"Demo Customer","bank_id":"PSB"},{"id":"priya","password":"Priya@2026","name":"Priya Sharma","bank_id":"PSB"}]'
+      # Mock Google sign-in mints a valid JWT for ANY email — keep it off.
+      - key: ALLOW_MOCK_OAUTH
+        value: "false"
+      # No Vapi keys on this deploy — voice MFA reports SIMULATED.
+      - key: VAPI_ENABLED
+        value: "false"
+      - key: ETHEREUM_BRIDGE_ENABLED
+        value: "false"
+      - key: BATCH_INTERVAL_SECONDS
+        value: "300"
+
+  # ── Redis (Render Key Value) — internal network only ──────────────────────
+  - type: keyvalue
+    name: derby-redis
+    plan: free
+    ipAllowList: []
+
+databases:
+  - name: derby-db
+    plan: free
+    databaseName: citadel
+    user: citadel
