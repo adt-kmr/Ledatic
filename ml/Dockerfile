@@ -1,25 +1,13 @@
-FROM ubuntu:22.04
+FROM python:3.11-slim
 
-ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-dev python3-venv python3-pip \
-    build-essential gfortran pkg-config libopenblas-dev cmake ninja-build \
-    llvm-15-dev libzstd-dev libncurses-dev libxml2-dev libedit-dev libffi-dev libjpeg-dev zlib1g-dev libfreetype6-dev libpng-dev libtiff-dev libwebp-dev \
-    curl ca-certificates \
+    gcc curl \
     && rm -rf /var/lib/apt/lists/*
 
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-ENV LLVM_CONFIG=/usr/bin/llvm-config-15
-
-RUN echo "setuptools<70" > /opt/constraints.txt
-ENV PIP_CONSTRAINT=/opt/constraints.txt
 COPY requirements.txt .
-RUN --mount=type=cache,target=/root/.cache/pip pip install "setuptools<70" wheel && pip install --no-build-isolation llvmlite==0.44.0
-RUN --mount=type=cache,target=/root/.cache/pip pip install --upgrade pip && \
-    pip install --timeout 120 --retries 10 \
+RUN pip install --no-cache-dir --timeout 120 --retries 10 \
     --extra-index-url https://download.pytorch.org/whl/cpu \
     -r requirements.txt
 

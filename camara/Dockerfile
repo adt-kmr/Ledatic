@@ -1,7 +1,6 @@
 FROM python:3.11-slim
 WORKDIR /app
 COPY requirements.txt .
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential gfortran pkg-config libopenblas-dev libffi-dev libssl-dev libpq-dev cargo rustc && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 EXPOSE 8002
