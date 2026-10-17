@@ -74,8 +74,8 @@ export const docSections: DocSection[] = [
             type: "code",
             language: "bash",
             filename: "terminal",
-            code: `git clone https://github.com/HarshdeepAthawale/Derby-Hack.git
-cd Derby-Hack
+            code: `git clone https://github.com/adt-kmr/Ledatic.git
+cd Ledatic
 make demo        # or: ./start.sh`,
           },
           {
