@@ -8,7 +8,6 @@
 //    frontend and backend share an origin or a proxy.
 //  - VITE_API_URL → explicit backend origin for split deployments (e.g. the
 //    frontend on Vercel calling an API on Render).
-const PROD_BACKEND_FALLBACK = "https://derby-hack.onrender.com";
 
 function resolveApiBase(): string {
   const raw = ((import.meta.env.VITE_API_URL as string | undefined) ?? "").trim().replace(/\/$/, "");
@@ -22,10 +21,6 @@ function resolveApiBase(): string {
       "[citadel] VITE_API_URL must be an absolute https:// backend URL. " +
       "Rebuild with VITE_API_URL=https://<backend-host> (no trailing slash).",
     );
-  }
-
-  if (typeof window !== "undefined" && window.location.hostname.endsWith(".vercel.app")) {
-    return PROD_BACKEND_FALLBACK;
   }
 
   return "";
