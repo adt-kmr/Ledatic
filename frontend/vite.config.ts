@@ -23,7 +23,7 @@ export default defineConfig({
       "/api": {
         // Host-machine dev: backend runs on localhost:8000. Inside a container
         // set VITE_PROXY_TARGET=http://backend:8000 (the compose service name).
-        target: process.env.VITE_PROXY_TARGET || process.env.VITE_API_URL || "http://localhost:8000",
+        target: process.env.VITE_PROXY_TARGET || "http://localhost:8000",
         changeOrigin: true,
       },
     },

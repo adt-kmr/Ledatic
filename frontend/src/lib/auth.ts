@@ -2,40 +2,13 @@
 // Tokens come from POST /api/auth/login only — there is no hidden fallback
 // account. If the backend rejects a login, the UI shows the real error.
 
-// API base resolution:
-//  - "" (default) → same-origin. Dev: Vite proxies /api → backend. Docker:
-//    nginx proxies /api → backend. This is the correct default everywhere the
-//    frontend and backend share an origin or a proxy.
-//  - VITE_API_URL → explicit backend origin for split deployments (e.g. the
-//    frontend on Vercel calling an API on Render).
-
+// API base resolution: same-origin by default (dev proxy / nginx proxy).
 function resolveApiBase(): string {
-  const raw = ((import.meta.env.VITE_API_URL as string | undefined) ?? "").trim().replace(/\/$/, "");
-  if (raw && /^https?:\/\//i.test(raw)) return raw;
-
-  if (raw && typeof window !== "undefined") {
-    // A common misconfig: VITE_API_URL set to the Google client id or another
-    // non-URL string. Relative fetch() then resolves under /demo/... and every
-    // POST hits the Vercel static host → 405 Method Not Allowed.
-    console.error(
-      "[citadel] VITE_API_URL must be an absolute https:// backend URL. " +
-      "Rebuild with VITE_API_URL=https://<backend-host> (no trailing slash).",
-    );
-  }
-
   return "";
 }
 
 export const API_BASE: string = resolveApiBase();
 
-if (!API_BASE && typeof window !== "undefined" &&
-    !["localhost", "127.0.0.1"].includes(window.location.hostname) &&
-    !import.meta.env.DEV) {
-  console.warn(
-    "[citadel] VITE_API_URL is not set — API calls go to the current origin. " +
-    "If the backend is hosted elsewhere, set VITE_API_URL at build time.",
-  );
-}
 
 /** Resolve an API path against the configured base. Absolute URLs pass through. */
 export function apiUrl(path: string): string {
