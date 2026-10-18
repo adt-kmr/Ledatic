@@ -4,6 +4,7 @@
   "installCommand": "cd frontend && npm install --include=dev --ignore-scripts",
   "framework": "vite",
   "rewrites": [
+    { "source": "/api/:path*", "destination": "http://148.100.77.154:5173/api/:path*" },
     { "source": "/((?!assets/).*)", "destination": "/index.html" }
   ],
   "headers": [
